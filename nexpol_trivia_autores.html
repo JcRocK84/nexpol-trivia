@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NEXPOL · Trivia de Autores</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root{
+  --primary:#1B3A6B;
+  --primary-light:#2E6F9E;
+  --primary-dark:#122745;
+  --gold:#C9A227;
+  --gold-light:#E4C763;
+  --bg:#F2F5F9;
+  --card:#FFFFFF;
+  --ink:#16202B;
+  --ink-soft:#556074;
+  --border:#DCE3EC;
+  --success:#2F8F5B;
+  --danger:#C1443C;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+}
+#app{max-width:980px;margin:0 auto;padding:18px 16px 50px;}
+@media(min-width:860px){
+  body{background:radial-gradient(circle at 50% 0%, #F8FAFC 0%, var(--bg) 60%);}
+  #app{max-width:1040px;padding:34px 30px 60px;}
+  .card{padding:28px 30px;}
+  .qtext{font-size:22px;}
+  .match-grid{grid-template-columns:repeat(6,1fr);}
+}
+@media(max-width:380px){
+  .brandbar h1{font-size:17px;}
+  .qtext{font-size:17px;}
+  .btn{font-size:14px;padding:12px 16px;}
+  .mode-card .icon{font-size:22px;}
+}
+
+.brandbar{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:18px;
+}
+.brandbar .badge-icon{
+  width:34px;height:34px;background:var(--primary);
+  clip-path:polygon(50% 0%,100% 20%,100% 65%,50% 100%,0% 65%,0% 20%);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold-light);font-family:'Baloo 2';font-weight:800;font-size:15px;
+  flex-shrink:0;
+}
+.brandbar h1{
+  font-family:'Baloo 2';font-weight:800;font-size:20px;color:var(--primary-dark);
+  margin:0;letter-spacing:.2px;
+}
+.brandbar span.tag{
+  font-family:'JetBrains Mono';font-size:11px;color:var(--ink-soft);
+  background:var(--card);border:1px solid var(--border);padding:2px 8px;border-radius:20px;
+}
+
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;margin-bottom:16px;box-shadow:0 2px 10px rgba(20,40,70,.05);
+}
+h2.section-title{
+  font-family:'Baloo 2';font-weight:700;font-size:18px;color:var(--primary-dark);
+  margin:0 0 14px;
+}
+p.lead{color:var(--ink-soft);font-size:14.5px;line-height:1.5;margin:0 0 16px;}
+
+input[type=text]{
+  width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);
+  font-family:'Inter';font-size:15px;outline:none;transition:border .15s;
+}
+input[type=text]:focus{border-color:var(--primary-light);}
+
+.btn{
+  font-family:'Baloo 2';font-weight:700;font-size:15px;
+  border:none;border-radius:10px;padding:13px 20px;cursor:pointer;
+  transition:transform .1s, box-shadow .15s;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-gold{background:var(--gold);color:var(--primary-dark);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary-light);}
+.btn-ghost:hover{background:#EAF1F8;}
+.btn-block{width:100%;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 13px;border-radius:20px;border:1.5px solid var(--border);
+  font-size:13.5px;font-weight:600;cursor:pointer;background:#fff;color:var(--ink-soft);
+  transition:all .12s;
+}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+
+.mode-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:6px;}
+@media(min-width:520px){.mode-grid{grid-template-columns:1fr 1fr 1fr;}}
+.mode-card{
+  border:2px solid var(--border);border-radius:12px;padding:16px 14px;cursor:pointer;
+  text-align:center;transition:all .15s;background:#fff;
+}
+.mode-card:hover{border-color:var(--primary-light);}
+.mode-card.active{border-color:var(--primary);background:#EAF1F8;}
+.mode-card .icon{font-size:26px;margin-bottom:6px;}
+.mode-card .name{font-family:'Baloo 2';font-weight:700;font-size:14.5px;color:var(--primary-dark);}
+.mode-card .desc{font-size:12px;color:var(--ink-soft);margin-top:3px;line-height:1.35;}
+
+/* Shield / rank signature */
+.shield{
+  width:56px;height:64px;background:linear-gradient(160deg,var(--primary-light),var(--primary));
+  clip-path:polygon(50% 0%,100% 18%,100% 62%,50% 100%,0% 62%,0% 18%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:2px solid var(--gold);flex-shrink:0;
+}
+.shield .stripes{display:flex;gap:2px;margin-top:4px;}
+.shield .stripe{width:6px;height:3px;background:var(--gold-light);border-radius:1px;}
+.rank-block{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.rank-info .rank-name{font-family:'Baloo 2';font-weight:700;font-size:16px;color:var(--primary-dark);}
+.rank-info .rank-score{font-family:'JetBrains Mono';font-size:13px;color:var(--ink-soft);}
+
+.progress-bar-outer{height:8px;background:var(--border);border-radius:6px;overflow:hidden;margin:6px 0 2px;}
+.progress-bar-inner{height:100%;background:var(--gold);border-radius:6px;transition:width .25s;}
+
+/* quiz */
+.timerbar-outer{height:6px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;}
+.timerbar-inner{height:100%;background:var(--primary-light);transition:width .1s linear;}
+.qmeta{display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;}
+.qtext{font-family:'Baloo 2';font-weight:700;font-size:19px;color:var(--primary-dark);line-height:1.35;margin-bottom:18px;}
+.qtext b{color:var(--primary);}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{
+  text-align:left;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);
+  background:#fff;font-family:'Inter';font-size:14.5px;font-weight:500;cursor:pointer;
+  transition:all .12s;
+}
+.opt:hover{border-color:var(--primary-light);}
+.opt.correct{background:#EAF7EF;border-color:var(--success);color:var(--success);font-weight:700;}
+.opt.wrong{background:#FBEAE8;border-color:var(--danger);color:var(--danger);font-weight:700;}
+.opt.disabled{pointer-events:none;}
+.lives{font-size:16px;letter-spacing:2px;}
+
+/* match game */
+.match-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+@media(min-width:480px){.match-grid{grid-template-columns:repeat(4,1fr);}}
+.match-card{
+  min-height:78px;border-radius:10px;border:1.5px solid var(--border);background:#fff;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:6px;font-size:11.5px;font-weight:600;cursor:pointer;color:var(--primary-dark);
+  transition:all .15s;
+}
+.match-card.hidden{background:linear-gradient(145deg,var(--primary-light),var(--primary));color:transparent;}
+.match-card.hidden::after{content:"?";color:var(--gold-light);font-family:'Baloo 2';font-size:20px;}
+.match-card.matched{background:#EAF7EF;border-color:var(--success);color:var(--success);cursor:default;}
+
+.tip-box{
+  background:#FFF8E8;border:1.5px solid var(--gold-light);border-radius:10px;
+  padding:12px 14px;font-size:13.5px;color:#6B5416;margin-top:14px;line-height:1.5;
+}
+.tip-box b{color:#8A6D1B;}
+
+.fail-item{
+  border-bottom:1px solid var(--border);padding:10px 0;font-size:14px;
+}
+.fail-item:last-child{border-bottom:none;}
+.fail-item .a{font-weight:700;color:var(--primary-dark);}
+.fail-item .c{color:var(--ink-soft);}
+
+table.lb{width:100%;border-collapse:collapse;font-size:14px;}
+table.lb th{text-align:left;font-family:'Baloo 2';color:var(--ink-soft);font-size:12.5px;padding:6px 4px;border-bottom:2px solid var(--border);}
+table.lb td{padding:9px 4px;border-bottom:1px solid var(--border);}
+.rank-num{font-family:'JetBrains Mono';color:var(--gold);font-weight:700;}
+
+.small-link{background:none;border:none;color:var(--primary-light);font-size:13px;cursor:pointer;text-decoration:underline;font-family:'Inter';padding:0;}
+.center{text-align:center;}
+.muted{color:var(--ink-soft);font-size:13.5px;}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ FIREBASE ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCbTLLF4c_3zME4IKkqZ1meabXhuAkga7w",
+  authDomain: "nexpol-trivial.firebaseapp.com",
+  projectId: "nexpol-trivial",
+  storageBucket: "nexpol-trivial.firebasestorage.app",
+  messagingSenderId: "683914392712",
+  appId: "1:683914392712:web:06ba09009426e7ef575b3d"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ============ DATA ============ */
+const TEMAS = [
+  {code:'T2', name:'Tema 2 · Constitución Española I'},
+  {code:'T4', name:'Tema 4 · La Unión Europea'},
+  {code:'T27', name:'Tema 27 · Derechos Humanos'},
+  {code:'T28', name:'Tema 28 · Globalización y Antiglobalización'},
+  {code:'T29', name:'Tema 29 · Actitudes y Valores Sociales'},
+  {code:'T30', name:'Tema 30 · Principios Éticos'},
+  {code:'T31', name:'Tema 31 · Inmigración'},
+  {code:'T32', name:'Tema 32 · Geografía Humana'},
+  {code:'T33', name:'Tema 33 · La Seguridad'},
+  {code:'T34', name:'Tema 34 · Drogodependencias'},
+  {code:'T35', name:'Tema 35 · Desarrollo Sostenible'},
+  {code:'T38', name:'Tema 38 · Sistemas Operativos'},
+  {code:'T39', name:'Tema 39 · Redes Informáticas'},
+  {code:'T40', name:'Tema 40 · Inteligencia'},
+];
+
+let _id=0;
+function E(tema,author,concept,tip){ _id++; return {id:_id,tema,author,concept,tip:tip||null}; }
+
+const DATA = [
+  E('T2','Fraga','Ponente de la Constitución'),
+  E('T2','Gabriel Cisneros','Ponente de la Constitución'),
+  E('T2','Gregorio Peces-Barba','Ponente de la Constitución'),
+  E('T2','Jordi Solé Tura','Ponente de la Constitución'),
+  E('T2','José Pedro Pérez-Llorca','Ponente de la Constitución'),
+  E('T2','Miguel Herrero','Ponente de la Constitución'),
+  E('T2','Miquel Roca','Ponente de la Constitución', 'Truco: son 7 padres de la Constitución, memorízalos como un equipo de 7 apellidos.'),
+
+  E('T4','Jean Monet','Ideólogo de la Unión Europea'),
+
+  E('T27','Karel Vasak','Generaciones de derechos humanos'),
+
+  E('T28','Adam Smith','La riqueza de las naciones, liberalismo'),
+  E('T28','Barber','Globalización, McWorld'),
+  E('T28','Bernard Cassen','Antiglobalización'),
+  E('T28','Castells','Globalización'),
+  E('T28','Dewey','Relativismo cultural'),
+  E('T28','Fukuyama','Globalización'),
+  E('T28','Giddens','Tercera vía'),
+  E('T28','Ignacio Ramonet','Antiglobalización'),
+  E('T28','Klaus M. Schwab','Foro Económico Mundial o Foro de Davos'),
+  E('T28','Levitt','Globalización'),
+  E('T28','McLuhan','Aldea global'),
+  E('T28','Naomi Klein','Antiglobalización'),
+  E('T28','Ohmae','Globalización'),
+  E('T28','Porter','Globalización'),
+  E('T28','Roland Robertson','Cultura global y glocalización'),
+  E('T28','Saskia Sassen','Ciudad global'),
+  E('T28','Subcomandante Marcos','Antiglobalización'),
+  E('T28','Sumner','Etnocentrismo'),
+  E('T28','Susan George','Antiglobalización'),
+  E('T28','Touraine','Nuevos movimientos sociales'),
+  E('T28','Ulrich Beck','Antiglobalización'),
+  E('T28','William James','Globalización', 'Ojo: 6 autores dicen simplemente globalización, Castells, Fukuyama, Levitt, Ohmae, Porter y William James.'),
+
+  E('T29','Adorno','Autoritarismo, escala-F'),
+  E('T29','Allport y Postman','Rumor'),
+  E('T29','Allport','Actitudes, estereotipos y prejuicio de endogrupo o exogrupo'),
+  E('T29','Asch','Efecto primacía y recencia'),
+  E('T29','Ashmore','Prejuicios'),
+  E('T29','Bandura','Teoría del aprendizaje vicario u observacional'),
+  E('T29','Bem','Análisis atributivo o teoría de la autopercepción'),
+  E('T29','Bogardus','Escala de distancia social'),
+  E('T29','Brigham','Estereotipos'),
+  E('T29','Burillo','Actitudes'),
+  E('T29','Campbell','Estereotipos'),
+  E('T29','Cooley','Grupo primario y secundario'),
+  E('T29','Echeverria y Villareal','Función ideológica de las actitudes'),
+  E('T29','Eysenck','Autoritarismo'),
+  E('T29','Festinger','Teoría de la disonancia cognitiva'),
+  E('T29','Fishbein y Ajzen','Teoría de la acción razonada'),
+  E('T29','Guttman','Escalas acumulativas'),
+  E('T29','Heider','Teoría del equilibrio'),
+  E('T29','Heintz','Prejuicios'),
+  E('T29','Horowitz','Teoría de la socialización de los prejuicios'),
+  E('T29','Katz','Actitudes y sus funciones'),
+  E('T29','Lewin','Endogrupo y exogrupo'),
+  E('T29','Likert','Escalas aditivas o de cálculos sumados'),
+  E('T29','Lippman','Estereotipos'),
+  E('T29','Mackie','Estereotipos'),
+  E('T29','Mayo','Grupo formal e informal'),
+  E('T29','McGuire','Teoría de la inoculación o modelo de los dos factores'),
+  E('T29','Merton','Efecto Pigmalión o Rosenthal, grupo de referencia y pertenencia'),
+  E('T29','Newcomb','Actitudes'),
+  E('T29','Osgood','Escala diferencial semántica'),
+  E('T29','Pavlov','Teoría del condicionamiento clásico'),
+  E('T29','Pettigrew y Meertens','Prejuicio sutil y manifiesto'),
+  E('T29','Petty y Cacciopo','Modelo de la probabilidad de la elaboración'),
+  E('T29','Rokeach','Actitudes, figura y fondo, escala D de dogmatismo, teoría de la creencia de los prejuicios'),
+  E('T29','Rosemberg y Hovland','Componentes de las actitudes'),
+  E('T29','Rosemberg','Teoría de la consistencia afectivo-cognitiva'),
+  E('T29','Sheriff','Teoría del conflicto realista'),
+  E('T29','Simmel','Grupos por su tamaño'),
+  E('T29','Skinner','Ley del refuerzo'),
+  E('T29','Stewart y Hoult','Autoritarismo'),
+  E('T29','Sumner','Intragrupo y extragrupo'),
+  E('T29','Tajfel','Estereotipos', '5 autores llevan estereotipos a secas, Brigham, Campbell, Lippman, Mackie y Tajfel, es el grupo mas confuso del tema 29.'),
+  E('T29','Thorndike','Efecto halo, teoría del conexionismo o ley del efecto'),
+  E('T29','Thurstone','Escalas diferenciales o experimentales'),
+  E('T29','Weber','Autoritarismo'),
+  E('T29','Zanden','Actitudes'),
+
+  E('T30','Aristóteles','Ética'),
+  E('T30','Berkowitz','Hooliganismo, teoría de la señal-activación'),
+  E('T30','Bernier','Raza'),
+  E('T30','Churchill','Fanatismo'),
+  E('T30','Comte','Sociología'),
+  E('T30','Dollar y Miller','Hooliganismo, teoría de la frustración'),
+  E('T30','Durkheim','Solidaridad mecánica y orgánica'),
+  E('T30','Erich Fromm','Libertad'),
+  E('T30','Erikson','Teoría psicosocial'),
+  E('T30','Freud y Jung','Sectarismo'),
+  E('T30','Freud','Teoría psicoanalítica'),
+  E('T30','Gaertner y Dovidio','Racismo aversivo'),
+  E('T30','Gobineau','Padre del racismo'),
+  E('T30','Hans Jonas','Responsabilidad'),
+  E('T30','John Rawls','Teoría de la justicia, igualdad'),
+  E('T30','Jürgen Habermas','Teoría del discurso'),
+  E('T30','Kant','Deontologismo'),
+  E('T30','Kleinpenning y Hagendoorn','No racismo, racismo aversivo, etnocéntrico, simbólico y biológico'),
+  E('T30','Kohlberg','Teoría del desarrollo moral', 'No lo confundas con Piaget, Kohlberg es desarrollo MORAL y Piaget es desarrollo COGNITIVO.'),
+  E('T30','Langone','Sectarismo'),
+  E('T30','Locke','Tolerancia'),
+  E('T30','Magnet','Hooliganismo'),
+  E('T30','Malinowski','Aculturación'),
+  E('T30','Maslow','Teoría de las necesidades'),
+  E('T30','Merton','Fanatismo, solidaridad, funciones y disfunciones'),
+  E('T30','Mill y Bentham','Utilitarismo'),
+  E('T30','Milton y Lyman Steward','Fundamentalismo'),
+  E('T30','Nietzsche','Ética'),
+  E('T30','Piaget','Teoría evolutiva del desarrollo cognitivo', 'Piaget aparece dos veces en tu temario, en el 30 es desarrollo cognitivo y en el 33 es teoría psicogenética.'),
+  E('T30','Rocher','Socialización y valores sociales, cambio social'),
+  E('T30','Rokeach','Valores sociales intrínsecos e instrumentales'),
+  E('T30','Stuart Mill','Libertad'),
+  E('T30','Taguieff','Racismo primario, secundario y terciario'),
+  E('T30','Taylor','Hooliganismo'),
+  E('T30','Tenenbaum','Hooliganismo', '5 autores tratan el hooliganismo, Berkowitz, Dollar y Miller, Magnet, Taylor y Tenenbaum. Solo los dos primeros añaden una teoría extra.'),
+  E('T30','Todorov','Racismo tradicional, racialismo, racismo científico'),
+  E('T30','Voltaire','Tolerancia', 'Locke y Voltaire son el equipo de la tolerancia ilustrada.'),
+  E('T30','Vygotsky','Teoría evolutiva sociocultural del aprendizaje'),
+  E('T30','Weber','Sectarismo'),
+
+  E('T31','Archer Jackson','Dimensiones de las migraciones'),
+  E('T31','Everett Lee','Proceso migratorio'),
+  E('T31','Lamo de Espinosa','Multiculturalismo o pluralismo cultural'),
+  E('T31','Park y Thomas','Asimilación'),
+  E('T31','Ravenstein','Teoría push-pull, las leyes de las migraciones'),
+  E('T31','Wolpert','Modelo de la geografía de la percepción'),
+  E('T31','Zangwill','Melting pot, crisol de culturas', 'Zangwill suena a zanja donde se funden culturas, el melting pot.'),
+  E('T31','Zapata-Barrero','Acomodación'),
+  E('T31','Zelinsky','Modelo evolutivo de las migraciones'),
+  E('T31','Zipf','Modelo gravitatorio o ley de la distancia inversa', 'El equipo Z del tema 31, Zangwill, Zapata-Barrero, Zelinsky y Zipf. Apréndelos juntos.'),
+
+  E('T32','Achille Guillard','Demografía'),
+  E('T32','Allport','Masas'),
+  E('T32','Blumer','Masas casuales, convencionales, expresivas, activas y de protesta; teoría del contagio'),
+  E('T32','Brown','Masas activas y pasivas'),
+  E('T32','Burgess','Modelo de crecimiento concéntrico'),
+  E('T32','Colin Clark','Ley general de la evolución de la población activa'),
+  E('T32','Frank Notestein','Teoría de la transición demográfica'),
+  E('T32','Haeckel y Taylor','Ecología'),
+  E('T32','Harris y Ullman','Modelo de crecimiento multinuclear'),
+  E('T32','Harvey','Enfoque cuantitativo de demografía'),
+  E('T32','Homer Hoyt','Modelo de crecimiento sectorial'),
+  E('T32','Howard','Ciudad jardín'),
+  E('T32','Hurd','Modelo de crecimiento en estrella o radial'),
+  E('T32','Kimbal Young','Muchedumbre y auditorio, clasificación de los públicos'),
+  E('T32','Kingsley Davis','Definición de ciudad'),
+  E('T32','Lebon','Psicología de las masas'),
+  E('T32','Livi Bacci','Perpetuación de la población'),
+  E('T32','Louis Wirth','Definición de ciudad'),
+  E('T32','Malthus','Teoría maltusiana'),
+  E('T32','Max Derrau','Definición de ciudad'),
+  E('T32','Max Sorre','Definición de ciudad, ecúmene y anecúmene', '4 autores definen ciudad, Kingsley Davis, Louis Wirth, Max Derrau y Max Sorre. Solo Max Sorre añade ecúmene y anecúmene.'),
+  E('T32','Munné','Público ordinario y auditorio, clasificación según su proximidad física o interés'),
+  E('T32','Ortega y Gasset','La rebelión de las masas, hombre masa'),
+  E('T32','Park','Ecología urbana'),
+  E('T32','Pierre George','Ciudad bidón'),
+  E('T32','Ratzel','Geografía humana'),
+  E('T32','Roger Brown','Clasificación de las turbas'),
+  E('T32','Simmel','Teoría de la mentalidad urbana'),
+  E('T32','Smelser','Teoría del valor añadido o tensión estructural'),
+  E('T32','Storkel','Masas organizativas, convencionales y espontáneas'),
+  E('T32','Tönnies','Gesellschaft y gemeinschafts'),
+  E('T32','Touraine','Ciudades fragmentadas'),
+  E('T32','Turner y Killian','Teoría de la norma emergente'),
+
+  E('T33','Adolphe Quételet','Leyes térmicas de la delincuencia'),
+  E('T33','Agnew','Teoría de la frustración o la tensión'),
+  E('T33','Akers','Teoría del aprendizaje social'),
+  E('T33','Bandura','Teoría del aprendizaje social o socioconductual'),
+  E('T33','Bertillón','Bertillonaje'),
+  E('T33','Catell y Eysenck','Teoría factorial o teoría de los rasgos'),
+  E('T33','Cloward y Ohlin','Teoría de la desigualdad de oportunidades'),
+  E('T33','Cohen','Teoría de la subcultura'),
+  E('T33','Durkheim','Anomia', 'Durkheim habla solo de anomia. Mertón amplía la anomia con 5 fases, conformismo, innovación, ritualismo, retraimiento y rebelión.'),
+  E('T33','Edward Ross','Control social'),
+  E('T33','Ellemberger','Victimogénesis'),
+  E('T33','Farrington','Modelo multifactorial'),
+  E('T33','Freud','Teoría psicoanalítica'),
+  E('T33','Garófalo','Clasificación de los delincuentes'),
+  E('T33','Glaser','Teoría de la identificación diferencial o teoría de los roles'),
+  E('T33','Gluek','Modelo multifactorial, broken homes'),
+  E('T33','Goffman','Estigmatización'),
+  E('T33','Hirschi','Teoría del arraigo, control social o autocontrol', 'Hirschi, el arraigo o vínculo social es lo que nos frena de delinquir.'),
+  E('T33','Kohlberg','Teoría del desarrollo moral'),
+  E('T33','Kretschmer y Sheldom','Modelo biotipológico'),
+  E('T33','Landrove','Clasificación de la víctima'),
+  E('T33','Lemert','Desviación primaria y secundaria, teorías del etiquetamiento o labeling approach'),
+  E('T33','Lombroso','Teoría del criminal nato', 'Lombroso, el criminal nato nace, no se hace.'),
+  E('T33','Marx y Engels','Teoría del conflicto de clases'),
+  E('T33','Mendelsohn y Von Henting','Victimología'),
+  E('T33','Mendelsohn','Clasificación de la víctima', 'Mendelsohn solo es clasificación de la víctima. Mendelsohn con Von Henting es victimología, la disciplina completa.'),
+  E('T33','Mertón','Anomia, conformismo, innovación, ritualismo, retraimiento y rebelión'),
+  E('T33','Neuman','Clasificación de la víctima'),
+  E('T33','Newman','Teoría espacial'),
+  E('T33','Park y Burgess','Teoría ecológica'),
+  E('T33','Park','Marginalidad'),
+  E('T33','Piaget','Teoría psicogenética'),
+  E('T33','Reckless','Teoría de contención'),
+  E('T33','Reiss','Teoría del control interior'),
+  E('T33','Sellin','Teoría del conflicto cultural'),
+  E('T33','Shawn y Mckay','Ciudad y delincuencia'),
+  E('T33','Sumner','Normas, folkways y mores'),
+  E('T33','Sutherland','Teoría de la asociación diferencial o de los contactos diferenciales', 'Sutherland, se aprende a delinquir por contacto con otros, como un contagio social.'),
+  E('T33','Zimbardo y Kelling','Teoría de las ventanas rotas', 'La ventana rota que nadie arregla invita a más delincuencia, así se explica su teoría.'),
+
+  E('T34','Arnold Washton','Etapas de la adicción'),
+  E('T34','Kramer y Cameron','Listado original de clasificación de las drogas'),
+
+  E('T35','Commoner','Sostenibilidad'),
+  E('T35','Daly','Sociedad sostenible'),
+  E('T35','Jay Forrester','World-2'),
+  E('T35','Wackernagel y Rees','Huella ecológica'),
+
+  E('T38','Bill Gates y Paul Allen','Windows'),
+  E('T38','Ken Thompson y Dennis Ritchie','UNIX'),
+  E('T38','Linus Torvalds','LINUX', 'Windows con Gates y Allen, UNIX con Thompson y Ritchie, LINUX con Torvalds, los 3 sistemas operativos con sus creadores.'),
+
+  E('T39','Vinton Cerf y Robert E. Kahn','Modelo TCP/IP', 'Cerf y Kahn son considerados los padres de Internet, crearon el modelo TCP/IP.'),
+
+  E('T40','Thomas Davenport y Laurence Prusak','Gestión del conocimiento'),
+];
+
+/* Curated confusion groups for "intruder" questions */
+const CONFUSION_GROUPS = [
+  {tema:'T2', label:'ser ponente de la Constitución', members:['Fraga','Gabriel Cisneros','Gregorio Peces-Barba','Jordi Solé Tura','José Pedro Pérez-Llorca','Miguel Herrero','Miquel Roca']},
+  {tema:'T28', label:'la globalización', members:['Castells','Fukuyama','Levitt','Ohmae','Porter','William James']},
+  {tema:'T28', label:'la antiglobalización', members:['Bernard Cassen','Ignacio Ramonet','Naomi Klein','Subcomandante Marcos','Susan George','Ulrich Beck']},
+  {tema:'T29', label:'el autoritarismo', members:['Adorno','Eysenck','Stewart y Hoult','Weber']},
+  {tema:'T29', label:'los estereotipos', members:['Brigham','Campbell','Lippman','Mackie','Tajfel']},
+  {tema:'T30', label:'el hooliganismo', members:['Berkowitz','Dollar y Miller','Magnet','Taylor','Tenenbaum']},
+  {tema:'T30', label:'el sectarismo', members:['Freud y Jung','Langone','Weber']},
+  {tema:'T30', label:'el racismo aversivo', members:['Gaertner y Dovidio','Kleinpenning y Hagendoorn']},
+  {tema:'T30', label:'la tolerancia', members:['Locke','Voltaire']},
+  {tema:'T31', label:'las migraciones, el equipo Z', members:['Zangwill','Zapata-Barrero','Zelinsky','Zipf']},
+  {tema:'T32', label:'la definición de ciudad', members:['Kingsley Davis','Louis Wirth','Max Derrau','Max Sorre']},
+  {tema:'T33', label:'la clasificación de la víctima', members:['Landrove','Mendelsohn','Neuman']},
+  {tema:'T33', label:'la anomia', members:['Durkheim','Mertón']},
+];
+
+/* ============ UTILS ============ */
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function sample(arr,n){return shuffle(arr).slice(0,n);}
+function slugify(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').slice(0,60);}
+function escapeHtml(s){return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function localGet(key){
+  try{ return localStorage.getItem('nexpol_'+key); }
+  catch(e){ return null; }
+}
+function localSet(key, value){
+  try{ localStorage.setItem('nexpol_'+key, value); return true; }
+  catch(e){ return false; }
+}
+async function storeGet(key, shared){
+  return localGet(key);
+}
+async function storeSet(key, value, shared){
+  return localSet(key, value);
+}
+async function getJSON(key, shared, fallback){
+  const v = await storeGet(key, shared);
+  if(v==null) return fallback;
+  try{ return JSON.parse(v); }catch(e){ return fallback; }
+}
+async function setJSON(key, obj, shared){
+  return storeSet(key, JSON.stringify(obj), shared);
+}
+
+function levelFor(score){
+  if(score>=1000) return {name:'Oficial de Oposición', idx:4};
+  if(score>=600) return {name:'Sargento', idx:3};
+  if(score>=350) return {name:'Cabo', idx:2};
+  if(score>=150) return {name:'Alumno NEXPOL', idx:1};
+  return {name:'Aspirante', idx:0};
+}
+
+/* ============ STATE ============ */
+const state = {
+  screen:'login',
+  playerName:'',
+  selectedTemas: TEMAS.map(t=>t.code),
+  mode:'trivial',
+  stats:{played:0,correct:0,answered:0,byAuthor:{}},
+  queue:[], qIndex:0, score:0, streak:0, lives:3, correctCount:0, failed:[],
+  timerHandle:null, timeLeft:0, timeTotal:0, answered:false,
+  matchCards:[], matchFlipped:[], matchMatchedCount:0, matchPairsTotal:0, matchAttempts:0, matchStart:0, matchSeconds:0,
+};
+
+function activePool(){
+  return DATA.filter(e=>state.selectedTemas.includes(e.tema));
+}
+function activeGroups(){
+  return CONFUSION_GROUPS.filter(g=>state.selectedTemas.includes(g.tema));
+}
+
+/* ============ INIT ============ */
+async function init(){
+  const savedName = await storeGet('playerName', false);
+  if(savedName){ state.playerName = savedName; }
+  const savedStats = await getJSON('stats', false, null);
+  if(savedStats) state.stats = savedStats;
+  state.screen = savedName ? 'menu' : 'login';
+  render();
+}
+
+/* ============ RENDER ROOT ============ */
+function render(){
+  const app = document.getElementById('app');
+  let html = '<div class="brandbar"><div class="badge-icon">N</div><h1>NEXPOL Trivia de Autores</h1><span class="tag">v1</span></div>';
+  if(state.screen==='login') html += renderLogin();
+  else if(state.screen==='menu') html += renderMenu();
+  else if(state.screen==='quiz') html += renderQuiz();
+  else if(state.screen==='match') html += renderMatch();
+  else if(state.screen==='results') html += renderResults();
+  else if(state.screen==='leaderboard') html += renderLeaderboardScreen();
+  else if(state.screen==='progress') html += renderProgress();
+  app.innerHTML = html;
+  if(state.screen==='leaderboard') loadLeaderboardData();
+}
+
+/* ============ LOGIN ============ */
+function renderLogin(){
+  return '<div class="card">'+
+    '<h2 class="section-title">¿Cómo te llamas, opositor/a?</h2>'+
+    '<p class="lead">Guardaremos tu progreso y tu mejor puntuación aparecerá en el ranking de la academia.</p>'+
+    '<input type="text" id="nameInput" placeholder="Tu nombre" maxlength="24" onkeydown="if(event.key===\'Enter\')submitName()">'+
+    '<div style="height:14px"></div>'+
+    '<button class="btn btn-primary btn-block" onclick="submitName()">Empezar</button>'+
+  '</div>';
+}
+async function submitName(){
+  const el = document.getElementById('nameInput');
+  const val = el.value.trim();
+  if(!val){ return; }
+  state.playerName = val;
+  await storeSet('playerName', val, false);
+  state.screen='menu';
+  render();
+}
+
+/* ============ MENU ============ */
+function renderMenu(){
+  const lvl = levelFor(state.stats.correct*10);
+  const chips = TEMAS.map(function(t){
+    return '<div class="chip '+(state.selectedTemas.includes(t.code)?'active':'')+'" onclick="toggleTema(\''+t.code+'\')">'+t.name.split('·')[0].trim()+'</div>';
+  }).join('');
+  return ''+
+  '<div class="card">'+
+    '<div class="rank-block">'+shieldHTML(lvl.idx)+
+      '<div class="rank-info">'+
+        '<div class="rank-name">'+escapeHtml(state.playerName)+' · '+lvl.name+'</div>'+
+        '<div class="rank-score">'+state.stats.correct+' aciertos totales</div>'+
+      '</div>'+
+    '</div>'+
+    '<button class="small-link" onclick="switchScreen(\'progress\')">Ver mi progreso</button>'+
+    ' &nbsp;·&nbsp; '+
+    '<button class="small-link" onclick="switchScreen(\'leaderboard\')">Ver ranking de la academia</button>'+
+  '</div>'+
+  '<div class="card">'+
+    '<h2 class="section-title">1. Elige los temas</h2>'+
+    '<p class="lead">Puedes centrarte en uno o varios. Por defecto están todos seleccionados.</p>'+
+    '<div class="chip-grid">'+chips+'</div>'+
+    '<button class="btn btn-ghost" onclick="selectAllTemas()">Seleccionar todos</button>'+
+  '</div>'+
+  '<div class="card">'+
+    '<h2 class="section-title">2. Elige el modo de juego</h2>'+
+    '<div class="mode-grid">'+
+      '<div class="mode-card '+(state.mode==='trivial'?'active':'')+'" onclick="setMode(\'trivial\')">'+
+        '<div class="icon">🎯</div><div class="name">Trivial clásico</div>'+
+        '<div class="desc">Preguntas tipo test, sin presión de tiempo.</div></div>'+
+      '<div class="mode-card '+(state.mode==='contrarreloj'?'active':'')+'" onclick="setMode(\'contrarreloj\')">'+
+        '<div class="icon">⏱️</div><div class="name">Contrarreloj</div>'+
+        '<div class="desc">3 vidas, tiempo limitado y racha de puntos.</div></div>'+
+      '<div class="mode-card '+(state.mode==='parejas'?'active':'')+'" onclick="setMode(\'parejas\')">'+
+        '<div class="icon">🃏</div><div class="name">Emparejar</div>'+
+        '<div class="desc">Encuentra las parejas autor y concepto.</div></div>'+
+    '</div>'+
+  '</div>'+
+  '<button class="btn btn-gold btn-block" style="font-size:17px;padding:16px;" onclick="startGame()">▶ Jugar</button>';
+}
+function shieldHTML(idx){
+  let stripes='';
+  for(let i=0;i<=idx;i++) stripes+='<div class="stripe"></div>';
+  return '<div class="shield"><div class="stripes">'+stripes+'</div></div>';
+}
+function toggleTema(code){
+  const i = state.selectedTemas.indexOf(code);
+  if(i>=0){ if(state.selectedTemas.length>1) state.selectedTemas.splice(i,1); }
+  else state.selectedTemas.push(code);
+  render();
+}
+function selectAllTemas(){ state.selectedTemas = TEMAS.map(function(t){return t.code;}); render(); }
+function setMode(m){ state.mode=m; render(); }
+function switchScreen(s){ state.screen=s; render(); }
+
+/* ============ QUESTION GENERATION ============ */
+function buildQuestion(pool, groups){
+  const useIntruder = groups.length>0 && Math.random()<0.22;
+  if(useIntruder){
+    const g = groups[Math.floor(Math.random()*groups.length)];
+    const members = g.members;
+    const three = sample(members, Math.min(3, members.length));
+    const outsiderCandidates = pool.filter(function(e){ return members.indexOf(e.author)===-1; });
+    if(outsiderCandidates.length>0){
+      const outsider = outsiderCandidates[Math.floor(Math.random()*outsiderCandidates.length)];
+      const options = shuffle(three.concat([outsider.author]));
+      return {
+        type:'intruder',
+        text:'¿Cuál de estos autores <b>NO</b> trabajó '+g.label+'?',
+        options:options, correct: outsider.author,
+        tip: outsider.tip
+      };
+    }
+  }
+  const entry = pool[Math.floor(Math.random()*pool.length)];
+  const dir = Math.random()<0.5 ? 'a2c' : 'c2a';
+  const distractPool = pool.filter(function(e){ return e.concept!==entry.concept; });
+  if(dir==='a2c'){
+    const wrong = sample(distractPool,3).map(function(e){return e.concept;});
+    const options = shuffle([entry.concept].concat(wrong));
+    return {type:'standard', text:'¿Qué defendió/formuló <b>'+escapeHtml(entry.author)+'</b>?', options:options, correct:entry.concept, authorForStats:entry.author, tip:entry.tip};
+  } else {
+    const wrong = sample(distractPool,3).map(function(e){return e.author;});
+    const options = shuffle([entry.author].concat(wrong));
+    return {type:'standard', text:'¿Quién formuló: "'+escapeHtml(entry.concept)+'"?', options:options, correct:entry.author, authorForStats:entry.author, tip:entry.tip};
+  }
+}
+
+/* ============ START GAME ============ */
+function startGame(){
+  const pool = activePool();
+  const groups = activeGroups();
+  if(state.mode==='parejas'){ startMatch(pool); return; }
+
+  const length = state.mode==='contrarreloj' ? Math.min(20, pool.length) : Math.min(15, pool.length);
+  state.queue = [];
+  for(let i=0;i<length;i++) state.queue.push(buildQuestion(pool, groups));
+  state.qIndex=0; state.score=0; state.streak=0; state.lives=3; state.correctCount=0; state.failed=[]; state.answered=false;
+  state.screen='quiz';
+  render();
+  if(state.mode==='contrarreloj') startTimer();
+}
+
+/* ============ QUIZ RENDER ============ */
+function renderQuiz(){
+  const q = state.queue[state.qIndex];
+  if(!q){ finishQuiz(); return '<div class="card"><p class="muted">Calculando resultados...</p></div>'; }
+  const isTR = state.mode==='contrarreloj';
+  let timerHtml='';
+  if(isTR){
+    const pct = Math.max(0, (state.timeLeft/state.timeTotal)*100);
+    timerHtml = '<div class="timerbar-outer"><div class="timerbar-inner" id="timerbarinner" style="width:'+pct+'%"></div></div>';
+  }
+  let livesHtml = '';
+  if(isTR){
+    livesHtml = '<span class="lives">'+'❤️'.repeat(state.lives)+'🖤'.repeat(3-state.lives)+'</span>';
+  }
+  const optsHtml = q.options.map(function(opt){
+    const safe = escapeHtml(opt).replace(/'/g,"&#39;");
+    return '<button class="opt" data-val="'+safe+'" onclick="answerQuiz(this)">'+escapeHtml(opt)+'</button>';
+  }).join('');
+  return '<div class="card">'+
+    '<div class="qmeta"><span>Pregunta '+(state.qIndex+1)+'/'+state.queue.length+'</span><span>Puntos: '+state.score+' '+livesHtml+'</span></div>'+
+    timerHtml+
+    '<div class="qtext">'+q.text+'</div>'+
+    '<div class="options">'+optsHtml+'</div>'+
+  '</div>';
+}
+
+function startTimer(){
+  clearInterval(state.timerHandle);
+  state.timeTotal = 9000; state.timeLeft = 9000;
+  state.timerHandle = setInterval(function(){
+    state.timeLeft -= 100;
+    const bar = document.getElementById('timerbarinner');
+    if(bar) bar.style.width = Math.max(0,(state.timeLeft/state.timeTotal)*100)+'%';
+    if(state.timeLeft<=0){
+      clearInterval(state.timerHandle);
+      if(!state.answered) timeoutQuiz();
+    }
+  },100);
+}
+
+function timeoutQuiz(){
+  state.answered=true;
+  const q = state.queue[state.qIndex];
+  state.failed.push(q);
+  state.lives--;
+  state.streak=0;
+  markStat(q, false);
+  revealAnswer(q, null);
+  setTimeout(nextQuestion, 1100);
+}
+
+function answerQuiz(btn){
+  if(state.answered) return;
+  state.answered=true;
+  clearInterval(state.timerHandle);
+  const chosen = btn.getAttribute('data-val').replace(/&#39;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+  const q = state.queue[state.qIndex];
+  const correct = chosen===q.correct;
+  if(correct){
+    state.correctCount++;
+    state.streak++;
+    const pts = 10 + Math.min(state.streak*2, 20);
+    state.score += pts;
+  } else {
+    state.failed.push(q);
+    state.streak=0;
+    if(state.mode==='contrarreloj') state.lives--;
+  }
+  markStat(q, correct);
+  revealAnswer(q, chosen);
+  setTimeout(nextQuestion, correct?700:1300);
+}
+
+function markStat(q, correct){
+  const key = q.authorForStats || q.correct;
+  if(!state.stats.byAuthor[key]) state.stats.byAuthor[key]={seen:0,correct:0};
+  state.stats.byAuthor[key].seen++;
+  if(correct) state.stats.byAuthor[key].correct++;
+  state.stats.answered++;
+  if(correct) state.stats.correct++;
+}
+
+function revealAnswer(q, chosen){
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(function(o){
+    o.classList.add('disabled');
+    const val = o.getAttribute('data-val').replace(/&#39;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+    if(val===q.correct) o.classList.add('correct');
+    else if(val===chosen) o.classList.add('wrong');
+  });
+  if(q.tip){
+    const card = document.querySelector('#app .card');
+    const div = document.createElement('div');
+    div.className='tip-box';
+    div.innerHTML = '💡 <b>Truco:</b> '+escapeHtml(q.tip);
+    card.appendChild(div);
+  }
+}
+
+function nextQuestion(){
+  state.qIndex++;
+  state.answered=false;
+  if(state.mode==='contrarreloj' && state.lives<=0){ finishQuiz(); return; }
+  if(state.qIndex>=state.queue.length){ finishQuiz(); return; }
+  render();
+  if(state.mode==='contrarreloj') startTimer();
+}
+
+async function finishQuiz(){
+  clearInterval(state.timerHandle);
+  state.stats.played++;
+  await setJSON('stats', state.stats, false);
+  await saveToLeaderboard();
+  state.screen='results';
+  render();
+}
+
+/* ============ MATCH GAME ============ */
+function startMatch(pool){
+  const counts = {};
+  pool.forEach(function(e){counts[e.concept]=(counts[e.concept]||0)+1;});
+  const uniquePool = pool.filter(function(e){return counts[e.concept]===1;});
+  const n = Math.min(uniquePool.length>=8 ? 8 : 6, uniquePool.length);
+  const chosen = sample(uniquePool, n);
+  let cards=[];
+  chosen.forEach(function(e){
+    cards.push({key:e.id+'a', pairId:e.id, text:e.author});
+    cards.push({key:e.id+'c', pairId:e.id, text:e.concept});
+  });
+  state.matchCards = shuffle(cards).map(function(c){ return Object.assign({}, c, {revealed:false, matched:false}); });
+  state.matchFlipped=[]; state.matchMatchedCount=0; state.matchPairsTotal=n; state.matchAttempts=0;
+  state.matchStart = Date.now();
+  state.score=0;
+  state.screen='match';
+  render();
+}
+
+function renderMatch(){
+  const cardsHtml = state.matchCards.map(function(c,i){
+    let cls='match-card';
+    if(c.matched) cls+=' matched';
+    else if(!c.revealed) cls+=' hidden';
+    return '<div class="'+cls+'" onclick="flipCard('+i+')">'+((c.matched||c.revealed)?escapeHtml(c.text):'')+'</div>';
+  }).join('');
+  return '<div class="card">'+
+    '<div class="qmeta"><span>Parejas: '+state.matchMatchedCount+'/'+state.matchPairsTotal+'</span><span>Intentos: '+state.matchAttempts+'</span></div>'+
+    '<p class="lead">Encuentra el autor y su concepto correspondiente.</p>'+
+    '<div class="match-grid" id="matchgrid">'+cardsHtml+'</div>'+
+  '</div>';
+}
+
+function flipCard(i){
+  const c = state.matchCards[i];
+  if(c.matched || c.revealed || state.matchFlipped.length>=2) return;
+  c.revealed=true;
+  state.matchFlipped.push(i);
+  render();
+  if(state.matchFlipped.length===2){
+    state.matchAttempts++;
+    const i1=state.matchFlipped[0], i2=state.matchFlipped[1];
+    const c1 = state.matchCards[i1], c2 = state.matchCards[i2];
+    if(c1.pairId===c2.pairId){
+      c1.matched=true; c2.matched=true;
+      state.matchMatchedCount++;
+      state.score += 15;
+      state.matchFlipped=[];
+      render();
+      if(state.matchMatchedCount>=state.matchPairsTotal) setTimeout(finishMatch, 500);
+    } else {
+      setTimeout(function(){
+        c1.revealed=false; c2.revealed=false;
+        state.matchFlipped=[];
+        render();
+      }, 850);
+    }
+  }
+}
+
+async function finishMatch(){
+  const seconds = Math.round((Date.now()-state.matchStart)/1000);
+  const bonus = Math.max(0, 60-seconds);
+  state.score += bonus;
+  state.failed=[];
+  state.correctCount = state.matchPairsTotal;
+  state.stats.played++;
+  await setJSON('stats', state.stats, false);
+  await saveToLeaderboard();
+  state.matchSeconds = seconds;
+  state.screen='results';
+  render();
+}
+
+/* ============ RESULTS ============ */
+function renderResults(){
+  const lvl = levelFor(state.score);
+  let failedHtml = '';
+  if(state.failed && state.failed.length>0){
+    failedHtml = '<h2 class="section-title" style="margin-top:18px;">Repasa lo que has fallado</h2>' +
+      state.failed.map(function(f){
+        return '<div class="fail-item"><span class="a">'+escapeHtml(f.correct)+'</span>'+
+          (f.tip?('<div class="tip-box" style="margin-top:6px;">💡 '+escapeHtml(f.tip)+'</div>'):'')+
+        '</div>';
+      }).join('');
+  }
+  const timeInfo = (state.mode==='parejas' && state.matchSeconds) ? ('<p class="muted">Tiempo: '+state.matchSeconds+'s</p>') : '';
+  const retryBtn = (state.failed && state.failed.length>0) ? '<button class="btn btn-primary" onclick="retryFailed()">🔁 Repetir fallos</button>' : '';
+  return '<div class="card center">'+
+    shieldHTML(lvl.idx)+
+    '<h2 class="section-title" style="margin-top:12px;">¡Partida terminada!</h2>'+
+    '<p class="lead">Puntuación: <b>'+state.score+'</b> · Rango: <b>'+lvl.name+'</b></p>'+
+    timeInfo+
+    '<div class="btn-row" style="justify-content:center;">'+
+      retryBtn+
+      '<button class="btn btn-ghost" onclick="switchScreen(\'menu\')">Volver al menú</button>'+
+      '<button class="btn btn-gold" onclick="switchScreen(\'leaderboard\')">Ver ranking</button>'+
+    '</div>'+
+  '</div>'+
+  (failedHtml ? ('<div class="card">'+failedHtml+'</div>') : '');
+}
+
+function retryFailed(){
+  const failedQs = state.failed.slice();
+  state.queue = failedQs;
+  state.qIndex=0; state.score=0; state.streak=0; state.lives=3; state.correctCount=0; state.failed=[]; state.answered=false;
+  if(state.mode==='parejas') state.mode='trivial';
+  state.screen='quiz';
+  render();
+  if(state.mode==='contrarreloj') startTimer();
+}
+
+/* ============ LEADERBOARD (Firestore) ============ */
+async function saveToLeaderboard(){
+  try{
+    const id = slugify(state.playerName) || ('anon_'+Date.now());
+    const ref = db.collection('players').doc(id);
+    const snap = await ref.get();
+    const existing = snap.exists ? snap.data() : null;
+    if(!existing || state.score > existing.bestScore){
+      await ref.set({
+        name: state.playerName,
+        bestScore: state.score,
+        mode: state.mode,
+        updatedAt: Date.now()
+      });
+    }
+  }catch(e){
+    console.error('No se pudo guardar en el ranking', e);
+  }
+}
+
+async function loadLeaderboardData(){
+  const container = document.getElementById('lbTableWrap');
+  try{
+    const snap = await db.collection('players').orderBy('bestScore','desc').limit(20).get();
+    let rows = '', i = 0;
+    snap.forEach(function(doc){
+      i++;
+      const e = doc.data();
+      rows += '<tr><td class="rank-num">#'+i+'</td><td>'+escapeHtml(e.name)+'</td><td>'+e.bestScore+'</td></tr>';
+    });
+    if(container){
+      container.innerHTML = i>0 ? ('<table class="lb"><tr><th>#</th><th>Alumno</th><th>Puntos</th></tr>'+rows+'</table>') : '<p class="muted">Aún no hay puntuaciones. ¡Sé el primero!</p>';
+    }
+  }catch(e){
+    console.error('No se pudo cargar el ranking', e);
+    if(container) container.innerHTML = '<p class="muted">No se pudo cargar el ranking. Comprueba tu conexión a internet.</p>';
+  }
+}
+
+function renderLeaderboardScreen(){
+  return '<div class="card">'+
+    '<h2 class="section-title">🏆 Ranking de la academia</h2>'+
+    '<p class="lead">Mejores puntuaciones de todos los alumnos que han jugado.</p>'+
+    '<div id="lbTableWrap"><p class="muted">Cargando...</p></div>'+
+    '<div style="height:14px"></div>'+
+    '<button class="btn btn-ghost" onclick="switchScreen(\'menu\')">Volver al menú</button>'+
+  '</div>';
+}
+
+/* ============ PROGRESS ============ */
+function renderProgress(){
+  const authors = Object.keys(state.stats.byAuthor);
+  const rows = authors
+    .map(function(a){ return Object.assign({a:a}, state.stats.byAuthor[a]); })
+    .sort(function(x,y){ return (x.correct/x.seen) - (y.correct/y.seen); })
+    .slice(0,15)
+    .map(function(r){ return '<div class="fail-item"><span class="a">'+escapeHtml(r.a)+'</span> <span class="c">— '+r.correct+'/'+r.seen+' aciertos</span></div>'; })
+    .join('');
+  const pct = state.stats.answered ? Math.round(100*state.stats.correct/state.stats.answered) : 0;
+  return '<div class="card">'+
+    '<h2 class="section-title">Mi progreso</h2>'+
+    '<p class="lead">Partidas jugadas: <b>'+state.stats.played+'</b> · Precisión global: <b>'+pct+'%</b></p>'+
+    '<div class="progress-bar-outer"><div class="progress-bar-inner" style="width:'+pct+'%"></div></div>'+
+  '</div>'+
+  '<div class="card">'+
+    '<h2 class="section-title">Autores a reforzar</h2>'+
+    '<p class="lead">Los que más se te resisten, según tu historial.</p>'+
+    (rows || '<p class="muted">Todavía no hay suficientes datos. ¡Juega una partida!</p>')+
+    '<div style="height:10px"></div>'+
+    '<button class="btn btn-ghost" onclick="switchScreen(\'menu\')">Volver al menú</button>'+
+  '</div>';
+}
+
+init();
+</script>
+</body>
+</html>
